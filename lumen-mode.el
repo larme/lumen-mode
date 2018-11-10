@@ -132,7 +132,7 @@
             (method
              (funcall method indent-point state))))))
 
-(defun lumne-paredit-setup () 1)
+(defun lumen-paredit-setup () 1)
 ;;;###autoload
 (define-derived-mode lumen-mode lisp-mode "Lumen"
   "Major mode for editing Lumen code.
