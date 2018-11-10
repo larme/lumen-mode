@@ -102,7 +102,7 @@
       (,lumen-defn-pattern 1 font-lock-variable-name-face)
       (,(rx (syntax open-parenthesis)
             (or "fn" "lambda" "λ") (1+ space)
-            (group (and (not (any "["))
+            (group (and (not (any "("))
                         (1+ (or (syntax word) (syntax symbol))))))
        1 font-lock-variable-name-face)
       (,(regexp-opt lumen-keywords 'symbols) . font-lock-keyword-face)
