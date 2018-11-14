@@ -128,6 +128,11 @@
             (method
              (funcall method indent-point state))))))
 
+(defvar lumen-imenu-generic-expression
+  '((nil "^(define\\s-+(?\\(\\sw+\\)" 1)
+    (nil "(define-global\\s-+(?\\(\\sw+\\)" 1)    ;; can be inside other form
+    (nil "^(define-macro\\s-+(?\\(\\sw+\\)" 1)))
+
 (defun lumen-paredit-setup () 1)
 ;;;###autoload
 (define-derived-mode lumen-mode lisp-mode "Lumen"
@@ -139,6 +144,9 @@
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'lisp-indent-function) 'lumen-indent-function)
   ;; (set (make-local-variable 'inferior-lisp-program) "lumen")
+  (setq-local imenu-case-fold-search t)
+  (setq-local imenu-generic-expression lumen-imenu-generic-expression)
+  (setq-local imenu-syntax-alist '(("+-*/.<>=?!$%_&~^:" . "w")))
   (set-syntax-table lumen-mode-syntax-table)
   (lumen-font-lock-setup)
   (add-hook 'paredit-mode-hook #'lumen-paredit-setup))
