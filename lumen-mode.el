@@ -101,11 +101,6 @@
   (eval-when-compile
     `((,lumen-variable-pattern 1 font-lock-variable-name-face)
       (,lumen-macro-pattern 1 font-lock-function-name-face)
-      (,(rx (syntax open-parenthesis)
-            (or "fn" "lambda" "λ") (1+ space)
-            (group (and (not (any "("))
-                        (1+ (or (syntax word) (syntax symbol))))))
-       1 font-lock-variable-name-face)
       (,(regexp-opt lumen-keywords 'symbols) . font-lock-keyword-face)
       (,(regexp-opt lumen-builtins 'symbols) . font-lock-builtin-face)
       (,(rx (group ":" (1+ word))) 0 font-lock-builtin-face)
