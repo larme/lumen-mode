@@ -63,7 +63,7 @@
     "dofile" "getfenv" "getmetatable" "io" "ipairs" "load" "loadfile"
     "loadstring" "math" "next" "os" "package" "pairs" "pcall" "rawequal"
     "rawget" "rawlen" "rawset" "require" "select" "setfenv" "setmetatable"
-    "string" "table" "unpack" "xpcall"
+    "string" "table" "boolean" "object" "function" "unpack" "xpcall"
 
     ;; functions in runtime.l
     "environment" "target"
