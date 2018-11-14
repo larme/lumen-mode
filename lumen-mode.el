@@ -146,7 +146,7 @@
   (setq-local imenu-case-fold-search t)
   (setq-local imenu-generic-expression lumen-imenu-generic-expression)
   (setq-local imenu-syntax-alist '(("+-*/.<>=?!$%_&~^:" . "w")))
-  (set-syntax-table lumen-mode-syntax-table)
+  ;; (set-syntax-table lumen-mode-syntax-table)
   (lumen-font-lock-setup)
   (add-hook 'paredit-mode-hook #'lumen-paredit-setup))
 
