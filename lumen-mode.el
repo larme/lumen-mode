@@ -32,7 +32,6 @@
 
 ;;; Code:
 
-
 (defvar lumen-keywords
   '(;; define-special words in compiler.l
     "do" "while" "break" "return" "new" "typeof" "throw" "get"
@@ -132,23 +131,19 @@
     (nil "(define-global\\s-+(?\\(\\sw+\\)" 1)    ;; can be inside other form
     (nil "^(define-macro\\s-+(?\\(\\sw+\\)" 1)))
 
-(defun lumen-paredit-setup () 1)
 ;;;###autoload
 (define-derived-mode lumen-mode lisp-mode "Lumen"
   "Major mode for editing Lumen code.
 
 \\{lumen-mode-map}"
   ;; TODO: completion using inferior-lisp
-  (make-local-variable 'lumen-module-name)
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'lisp-indent-function) 'lumen-indent-function)
   ;; (set (make-local-variable 'inferior-lisp-program) "lumen")
   (setq-local imenu-case-fold-search t)
   (setq-local imenu-generic-expression lumen-imenu-generic-expression)
   (setq-local imenu-syntax-alist '(("+-*/.<>=?!$%_&~^:" . "w")))
-  ;; (set-syntax-table lumen-mode-syntax-table)
-  (lumen-font-lock-setup)
-  (add-hook 'paredit-mode-hook #'lumen-paredit-setup))
+  (lumen-font-lock-setup))
 
 (put 'fn 'lumen-indent-function 'defun)
 (put 'define 'lumen-indent-function 'defun)
