@@ -85,21 +85,22 @@
     "abs" "acos" "asin" "atan" "atan2" "ceil" "cos" "floor" "log" "log10"
     "max" "min" "pow" "random" "sin" "sinh" "sqrt" "tan" "tanh" "trunc"))
 
-(defvar lumen-local-fn-pattern
+(defvar lumen-variable-pattern
+  ;; it's not possible simply recognize if symbol following define (or define-global) is
+  ;; function or not, so everything is variable then.
   (rx (syntax open-parenthesis)
       (or "define-global" "define" "set") (1+ space)
-      (group (1+ (or (syntax word) (syntax symbol) "-" "_")))
-      (0+ (syntax whitespace)) ;; newline will cause this to not match
-      (syntax open-parenthesis) (or "fn" "lambda" "λ")))
+      (group (1+ (or (syntax word) (syntax symbol))))))
 
-(defvar lumen-defn-pattern
-  (rx (syntax open-parenthesis) "defn" (1+ space)
-      (group (1+ (or (syntax word) (syntax symbol) "-" "_")))))
+(defvar lumen-macro-pattern
+  (rx (syntax open-parenthesis)
+      "define-macro" (1+ space)
+      (group (1+ (or (syntax word) (syntax symbol))))))
 
 (defvar lumen-font-lock-keywords
   (eval-when-compile
-    `((,lumen-local-fn-pattern 1 font-lock-variable-name-face)
-      (,lumen-defn-pattern 1 font-lock-variable-name-face)
+    `((,lumen-variable-pattern 1 font-lock-variable-name-face)
+      (,lumen-macro-pattern 1 font-lock-function-name-face)
       (,(rx (syntax open-parenthesis)
             (or "fn" "lambda" "λ") (1+ space)
             (group (and (not (any "("))
