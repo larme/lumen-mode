@@ -54,8 +54,7 @@
     "with-indent"
     "export" "when-compiling" "during-compilation"
 
-    "or" "and" "true" "false" "nil"
-    "." "+" ".." "^" "-" "*" "%" "/" ">" "<" ">=" "<=" "=" "~=" "#" "..." ":"))
+    "or" "and" "true" "false" "nil"))
 
 (defvar lumen-builtins
   '(;; lua builtin
