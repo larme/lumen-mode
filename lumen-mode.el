@@ -32,7 +32,6 @@
 
 ;;; Code:
 
-
 (defvar lumen-keywords
   '(;; define-special words in compiler.l
     "do" "while" "break" "return" "new" "typeof" "throw" "get"
@@ -54,8 +53,7 @@
     "with-indent"
     "export" "when-compiling" "during-compilation"
 
-    "or" "and" "true" "false" "nil"
-    "." "+" ".." "^" "-" "*" "%" "/" ">" "<" ">=" "<=" "=" "~=" "#" "..." ":"))
+    "or" "and" "true" "false" "nil"))
 
 (defvar lumen-builtins
   '(;; lua builtin
@@ -63,7 +61,7 @@
     "dofile" "getfenv" "getmetatable" "io" "ipairs" "load" "loadfile"
     "loadstring" "math" "next" "os" "package" "pairs" "pcall" "rawequal"
     "rawget" "rawlen" "rawset" "require" "select" "setfenv" "setmetatable"
-    "string" "table" "unpack" "xpcall"
+    "string" "table" "boolean" "object" "function" "unpack" "xpcall"
 
     ;; functions in runtime.l
     "environment" "target"
@@ -85,26 +83,22 @@
     "abs" "acos" "asin" "atan" "atan2" "ceil" "cos" "floor" "log" "log10"
     "max" "min" "pow" "random" "sin" "sinh" "sqrt" "tan" "tanh" "trunc"))
 
-(defvar lumen-local-fn-pattern
+(defvar lumen-variable-pattern
+  ;; it's not possible simply recognize if symbol following define (or define-global) is
+  ;; function or not, so everything is variable then.
   (rx (syntax open-parenthesis)
       (or "define-global" "define" "set") (1+ space)
-      (group (1+ (or (syntax word) (syntax symbol) "-" "_")))
-      (0+ (syntax whitespace)) ;; newline will cause this to not match
-      (syntax open-parenthesis) (or "fn" "lambda" "λ")))
+      (group (1+ (or (syntax word) (syntax symbol))))))
 
-(defvar lumen-defn-pattern
-  (rx (syntax open-parenthesis) "defn" (1+ space)
-      (group (1+ (or (syntax word) (syntax symbol) "-" "_")))))
+(defvar lumen-macro-pattern
+  (rx (syntax open-parenthesis)
+      "define-macro" (1+ space)
+      (group (1+ (or (syntax word) (syntax symbol))))))
 
 (defvar lumen-font-lock-keywords
   (eval-when-compile
-    `((,lumen-local-fn-pattern 1 font-lock-variable-name-face)
-      (,lumen-defn-pattern 1 font-lock-variable-name-face)
-      (,(rx (syntax open-parenthesis)
-            (or "fn" "lambda" "λ") (1+ space)
-            (group (and (not (any "["))
-                        (1+ (or (syntax word) (syntax symbol))))))
-       1 font-lock-variable-name-face)
+    `((,lumen-variable-pattern 1 font-lock-variable-name-face)
+      (,lumen-macro-pattern 1 font-lock-function-name-face)
       (,(regexp-opt lumen-keywords 'symbols) . font-lock-keyword-face)
       (,(regexp-opt lumen-builtins 'symbols) . font-lock-builtin-face)
       (,(rx (group ":" (1+ word))) 0 font-lock-builtin-face)
@@ -132,20 +126,24 @@
             (method
              (funcall method indent-point state))))))
 
-(defun lumne-paredit-setup () 1)
+(defvar lumen-imenu-generic-expression
+  '((nil "^(define\\s-+(?\\(\\sw+\\)" 1)
+    (nil "(define-global\\s-+(?\\(\\sw+\\)" 1)    ;; can be inside other form
+    (nil "^(define-macro\\s-+(?\\(\\sw+\\)" 1)))
+
 ;;;###autoload
 (define-derived-mode lumen-mode lisp-mode "Lumen"
   "Major mode for editing Lumen code.
 
 \\{lumen-mode-map}"
   ;; TODO: completion using inferior-lisp
-  (make-local-variable 'lumen-module-name)
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'lisp-indent-function) 'lumen-indent-function)
   ;; (set (make-local-variable 'inferior-lisp-program) "lumen")
-  (set-syntax-table lumen-mode-syntax-table)
-  (lumen-font-lock-setup)
-  (add-hook 'paredit-mode-hook #'lumen-paredit-setup))
+  (setq-local imenu-case-fold-search t)
+  (setq-local imenu-generic-expression lumen-imenu-generic-expression)
+  (setq-local imenu-syntax-alist '(("+-*/.<>=?!$%_&~^:" . "w")))
+  (lumen-font-lock-setup))
 
 (put 'fn 'lumen-indent-function 'defun)
 (put 'define 'lumen-indent-function 'defun)
